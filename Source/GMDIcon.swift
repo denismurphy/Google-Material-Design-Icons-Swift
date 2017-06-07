@@ -162,17 +162,22 @@ private class FontLoader {
 		let data = NSData(contentsOf: fontURL!)!
 		
 		let provider = CGDataProvider(data: data)
-		let font = CGFont(provider!)
+        let font : CGFont? = CGFont(provider!)
 		
 		var error: Unmanaged<CFError>?
-        if !CTFontManagerRegisterGraphicsFont(font!, &error) {
+        if fontManagerRegisterGraphicsFont(font:font, &error) {
 			
 			let errorDescription: CFString = CFErrorCopyDescription(error!.takeUnretainedValue())
 			let nsError = error!.takeUnretainedValue() as AnyObject as! NSError
 			NSException(name: NSExceptionName.internalInconsistencyException, reason: errorDescription as String, userInfo: [NSUnderlyingErrorKey: nsError]).raise()
 		}
-		return font!
+        
+            return font!
 	} ()
+}
+
+func fontManagerRegisterGraphicsFont ( font: CGFont?, _ error: UnsafeMutablePointer<Unmanaged<CFError>?>?) -> Bool {
+    return !CTFontManagerRegisterGraphicsFont(font!, error)
 }
 
 
